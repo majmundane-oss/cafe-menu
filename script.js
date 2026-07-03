@@ -138,7 +138,13 @@ function renderHome(){
   `;
 }
 
+function goBack() {
+  history.back();
+}
+
 function openCategory(cat){
+  history.pushState({ category: cat }, "", "#" + encodeURIComponent(cat));
+
   const items = menu[cat];
   app.innerHTML = `
     <div class="back" onclick="renderHome()">← Nazad</div>
@@ -154,5 +160,9 @@ function openCategory(cat){
     `).join("")}
   `;
 }
+
+window.addEventListener("popstate", () => {
+  renderHome();
+});
 
 renderHome();
