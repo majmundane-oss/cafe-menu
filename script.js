@@ -138,12 +138,12 @@ function renderHome(){
   `;
 }
 
-function goBack() {
-  history.back();
+function goBack(){
+  window.location.hash = "";
 }
 
 function openCategory(cat){
-  history.pushState({ category: cat }, "", "#" + encodeURIComponent(cat));
+  window.location.hash = cat;
 
   const items = menu[cat];
   app.innerHTML = `
@@ -161,8 +161,10 @@ function openCategory(cat){
   `;
 }
 
-window.addEventListener("popstate", () => {
-  renderHome();
-});
-
 renderHome();
+
+window.addEventListener("hashchange", () => {
+  if (!window.location.hash) {
+    renderHome();
+  }
+});
