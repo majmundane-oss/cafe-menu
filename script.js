@@ -1,4 +1,4 @@
-const menu = {
+/*const menu = {
   "Kafe i topli napici": [
     ["Espresso", "220"],
     ["Dupli espresso", "300"],
@@ -122,49 +122,112 @@ const menu = {
     ["Sarti Spritz", "450", "sarti, prosecco, soda"]
   ]
 };
-
-
+*/
+const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT1rItzXWh6kr0zvnpMNc2RglzlwLm4caLVHWl0seuzntPRbmfdKyiSGs-dWjBaeeSEwdnG065T66cr/pub?output=csv";
+let menu = {};
 const app = document.getElementById("app");
 
-function renderHome(){
+function slugify(str) {
+  return (str || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "D")
+    .trim()
+    .replace(/\s+/g, "_");
+}
+
+function deslugify(str) {
+  return (str || "").replace(/_/g, " ");
+}
+
+function fetchMenu() {
+  fetch(SHEET_URL)
+    .then(res => res.text())
+    .then(csv => {
+      menu = parseCSV(csv);
+      router();
+    });
+}
+
+function parseCSV(csv) {
+  const lines = csv.trim().split("\n");
+  lines.shift();
+
+  const result = {};
+
+  lines.forEach(line => {
+    const parts = line.split(",");
+
+    const categoryRaw = (parts[0] || "").trim();
+    const category = slugify(categoryRaw);
+
+    const name = (parts[1] || "").trim();
+    const price = (parts[2] || "").trim();
+    const description = parts.slice(3).join(",").trim();
+
+    if (!category || !name) return;
+
+    if (!result[category]) result[category] = [];
+
+    result[category].push([name, price, description]);
+  });
+
+  return result;
+}
+
+function router() {
+  const hash = decodeURIComponent(window.location.hash.replace("#", ""));
+
+  if (!hash) {
+    renderHome();
+    return;
+  }
+
+  renderCategory(hash);
+}
+
+function renderHome() {
   app.innerHTML = `
     <div class="grid">
       ${Object.keys(menu).map(cat => `
-        <div class="card" onclick="openCategory('${cat}')">
-          ${cat}
+        <div class="card" onclick="goToCategory('${cat}')">
+          ${deslugify(cat)}
         </div>
       `).join("")}
     </div>
   `;
 }
 
-function goBack(){
-  window.location.hash = "";
+function goToCategory(cat) {
+  const slug = slugify(cat);
+  window.location.hash = encodeURIComponent(slug);
 }
 
-function openCategory(cat){
-  window.location.hash = cat;
-
+function renderCategory(cat) {
   const items = menu[cat];
+
+  if (!items) {
+    renderHome();
+    return;
+  }
+
   app.innerHTML = `
-    <div class="back" onclick="renderHome()">← Nazad</div>
-    <h2>${cat}</h2>
+    <div class="back" onclick="history.back()">← Nazad</div>
+    <h2>${deslugify(cat)}</h2>
+
     ${items.map(i => `
       <div class="item">
         <div class="left">
           <span class="name">${i[0]}</span>
           ${i[2] ? `<span class="flavours">${i[2]}</span>` : ""}
         </div>
-          <span class="price">${i[1]}</span>
+        <span class="price">${i[1]}</span>
       </div>
     `).join("")}
   `;
 }
 
-renderHome();
+window.addEventListener("hashchange", router);
 
-window.addEventListener("hashchange", () => {
-  if (!window.location.hash) {
-    renderHome();
-  }
-});
+fetchMenu();
