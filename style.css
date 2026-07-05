@@ -60,12 +60,15 @@ padding:25px;
 border-radius:16px;
 text-align:center;
 cursor:pointer;
-transition:0.2s;
+transition: transform 0.15s ease, filter 0.15s ease;
 font-size:18px;
+-webkit-tap-highlight-color: transparent;
+user-select: none;
 }
 
-.card:hover{
-transform:scale(1.05);
+.card.pressed {
+  transform: scale(1.08);
+  filter: brightness(0.9);
 }
 
 .item{

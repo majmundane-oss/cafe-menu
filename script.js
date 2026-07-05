@@ -177,7 +177,7 @@ function parseCSV(csv) {
 }
 
 function router() {
-  const hash = decodeURIComponent(window.location.hash.replace("#", ""));
+  const hash = window.location.hash.replace("#", "");
 
   if (!hash) {
     renderHome();
@@ -191,7 +191,7 @@ function renderHome() {
   app.innerHTML = `
     <div class="grid">
       ${Object.keys(menu).map(cat => `
-        <div class="card" onclick="goToCategory('${cat}')">
+        <div class="card" onclick="pressAndGo('${cat}', this)">
           ${deslugify(cat)}
         </div>
       `).join("")}
@@ -199,9 +199,17 @@ function renderHome() {
   `;
 }
 
+function pressAndGo(cat, el) {
+  el.classList.add("pressed");
+
+  setTimeout(() => {
+    window.location.hash = cat;
+  }, 60);
+}
+
 function goToCategory(cat) {
   const slug = slugify(cat);
-  window.location.hash = encodeURIComponent(slug);
+  window.location.hash = slug;
 }
 
 function renderCategory(cat) {
