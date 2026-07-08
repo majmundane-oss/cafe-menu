@@ -142,11 +142,34 @@ function deslugify(str) {
 }
 
 function fetchMenu() {
-  fetch(SHEET_URL)
+
+  const savedMenu = localStorage.getItem("menu");
+
+  fetch(SHEET_URL + "&cache=" + Date.now())
     .then(res => res.text())
     .then(csv => {
+
       menu = parseCSV(csv);
-      router();
+
+      localStorage.setItem("menu", JSON.stringify(menu));
+
+      window.location.hash = "";
+      renderHome(false);
+
+    })
+    .catch(() => {
+
+      if (savedMenu) {
+        menu = JSON.parse(savedMenu);
+        renderHome(false);
+      } else {
+        app.innerHTML = `
+          <div class="loader">
+            <p>Greška pri učitavanju menija</p>
+          </div>
+        `;
+      }
+
     });
 }
 
@@ -187,14 +210,16 @@ function router() {
   renderCategory(hash);
 }
 
-function renderHome() {
+function renderHome(animate = false){
   app.innerHTML = `
-    <div class="grid">
-      ${Object.keys(menu).map(cat => `
-        <div class="card" onclick="pressAndGo('${cat}', this)">
-          ${deslugify(cat)}
-        </div>
-      `).join("")}
+    <div class="page ${animate ? "slide-in" : ""}">
+      <div class="grid">
+        ${Object.keys(menu).map(cat => `
+          <div class="card" onclick="pressAndGo('${cat}', this)">
+            ${deslugify(cat)}
+          </div>
+        `).join("")}
+      </div>
     </div>
   `;
 }
@@ -203,13 +228,14 @@ function pressAndGo(cat, el) {
   el.classList.add("pressed");
 
   setTimeout(() => {
+    el.classList.remove("pressed");
     window.location.hash = cat;
   }, 60);
 }
 
-function goToCategory(cat) {
-  const slug = slugify(cat);
-  window.location.hash = slug;
+function goHome() {
+  history.pushState(null, "", window.location.pathname);
+  renderHome();
 }
 
 function renderCategory(cat) {
@@ -221,18 +247,21 @@ function renderCategory(cat) {
   }
 
   app.innerHTML = `
-    <div class="back" onclick="history.back()">← Nazad</div>
-    <h2>${deslugify(cat)}</h2>
+    <div class="page slide-in">
+      <div class="back" onclick="goHome()">← Nazad</div>
 
-    ${items.map(i => `
-      <div class="item">
-        <div class="left">
-          <span class="name">${i[0]}</span>
-          ${i[2] ? `<span class="flavours">${i[2]}</span>` : ""}
+      <h2>${deslugify(cat)}</h2>
+
+      ${items.map(i => `
+        <div class="item">
+          <div class="left">
+            <span class="name">${i[0]}</span>
+            ${i[2] ? `<span class="flavours">${i[2]}</span>` : ""}
+          </div>
+          <span class="price">${i[1]}</span>
         </div>
-        <span class="price">${i[1]}</span>
-      </div>
-    `).join("")}
+      `).join("")}
+    </div>
   `;
 }
 
