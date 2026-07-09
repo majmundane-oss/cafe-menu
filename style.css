@@ -33,29 +33,27 @@ margin:auto;
 padding:20px;
 }
 
-.grid{
-display: flex;
-flex-direction: column;
-gap: 12px;
+.grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
 }
 
-.card{
-background:#f5edda;
-padding:25px;
-border-radius:16px;
-text-align:center;
-cursor:pointer;
-transition:transform .15s ease, filter .15s ease;
-font-size:20px;
+.card {
+  background:#f5edda;
+  padding:18px 25px;
+  border-radius:16px;
+  text-align:center;
+  cursor:pointer;
+  transition:transform .15s ease, filter .15s ease;
+  font-size:20px;
 
--webkit-tap-highlight-color: transparent;
+  width:100%;
+  max-width:400px;
 
-user-select:none;
--webkit-user-select:none;
--moz-user-select:none;
--ms-user-select:none;
-
-touch-action:manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select:none;
 }
 
 .card.pressed {
@@ -81,17 +79,14 @@ background:#f5edda;
 border-radius:10px;
 cursor:pointer;
 user-select:none;
--webkit-user-select:none;
--moz-user-select:none;
--ms-user-select:none;
 
 -webkit-tap-highlight-color: transparent;
 touch-action:manipulation;
 }
 
-img {
-max-width: 100%;
-height: auto;
+body img {
+max-width:100%;
+height:auto;
 }
 
 .left {
@@ -109,18 +104,6 @@ margin-top: 2px;
 
 .name {
 font-size: 16px;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity:0;
-    transform:translateX(20px);
-  }
-
-  to {
-    opacity:1;
-    transform:translateX(0);
-  }
 }
 
 .page {
