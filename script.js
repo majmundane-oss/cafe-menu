@@ -12,7 +12,7 @@ function fetchMenu() {
 
   const savedMenu = localStorage.getItem("menu");
 
-  fetch(SHEET_URL + "&cache=" + Date.now())
+  fetch(SHEET_URL)
     .then(res => res.text())
     .then(csv => {
 
