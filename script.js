@@ -54,7 +54,7 @@ function parseCSV(csv) {
 
     const name = (parts[1] || "").trim();
     const price = (parts[2] || "").trim();
-    const description = parts.slice(3).join(",").trim().replace(/\|/g, ",");
+    const description = parts.slice(3).join(",").trim().replace(/\./g, ",");
 
     if (!category || !name) return;
 
